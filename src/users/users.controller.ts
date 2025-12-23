@@ -16,51 +16,37 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersParamDto } from './dto/get-users-param.dto';
 import { PatchUserDto } from './dto/patch-user.dto';
 import { UsersService } from './users.service';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
+@ApiTags('Users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService) {}
+  constructor(
+    // Injecting Users Service
+    private readonly usersService: UsersService,
+  ) {}
 
-    /**
-     * 
-     * Final Endpoint: /users/:id?limit=10&page=1
-     * Param id - optional, convert to int, cannot have a default value
-     * Query limit - integer, default value 10
-     * Query page - integer, default value 1
-     * 
-     * ===> 
-     * Use case:
-     * /users/ --> return all users with default limit and page
-     * /users/5 --> return user with id 5 with default limit and page
-     * /users?limit=20&page=2 --> return user with id 5 with limit 20 and page 2
-     */
+  @Get('{/:id}')
+  @ApiOperation({ summary: 'Get all users with pagination' })
+  @ApiResponse({ status: 200, description: 'List of users' })
+  @ApiQuery({ name: 'limit', required: false, type: 'number', description: 'Limit number of users returned', example: 10 })
+  @ApiQuery({ name: 'page', required: false, type: 'number', description: 'Page number for pagination', example: 1 })
+  public getUsers(
+    @Param() getUserParamDto: GetUsersParamDto,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    return this.usersService.findAll(getUserParamDto, limit, page);
+  }
 
-    @Get('{/:id}')
-    public getUsers(
-        @Param() getUsersParamDto: GetUsersParamDto, 
-        @Query('limit',new DefaultValuePipe(10) ,ParseIntPipe) limit:any,
-        @Query('page',new DefaultValuePipe(1) ,ParseIntPipe) page:any
-    ) {
-        console.log(getUsersParamDto);
-        return 'You sent a request to get all users';
-    }
+  @Post()
+  public createUsers(@Body() createUserDto: CreateUserDto) {
+    console.log(createUserDto instanceof CreateUserDto);
+    return 'You sent a post request to users endpoint';
+  }
 
-    @Post()
-    public createUser(
-        @Body() createUserDto: CreateUserDto,
-        @Headers() header: any,
-        @Ip() ip: string
-    ) {
-        console.log(createUserDto);
-        console.log(typeof createUserDto);
-        console.log(createUserDto instanceof CreateUserDto);
-        return 'You sent a request to create a user';
-    }
-
-    @Patch()
-    public updateUser(
-        @Body() patchUserDto: PatchUserDto
-    ) {
-        return 'You sent a request to update a user';
-    }
+  @Patch()
+  public patchUser(@Body() patchUserDto: PatchUserDto) {
+    return patchUserDto;
+  }
 }
