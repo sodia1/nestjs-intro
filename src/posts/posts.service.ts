@@ -7,7 +7,7 @@ export class PostsService {
 
 
     public findAll(userId: string) {
-    const user = this.usersService.findOneById(userId);
+    const user = this.usersService.findOneById(+userId);
 
     return [
       {

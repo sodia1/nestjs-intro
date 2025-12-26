@@ -1,7 +1,7 @@
-export enum PostStatus{
-    PUBLISHED= 'Published',
-    DRAFT ='Draft',
-    ARCHIVED= 'Archived',
-    REVIEWED='Reviewed',
-    SCHEDULED='Scheduled'
+//draft, scheduled, review, published
+export enum postStatus {
+  DRAFT = 'draft',
+  SCHEDULED = 'scheduled',
+  REVIEW = 'review',
+  PUBLISHED = 'published',
 }

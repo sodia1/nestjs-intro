@@ -1,7 +1,7 @@
 import { IsArray, IsDate, IsEnum, isISO8601, IsJSON, IsNotEmpty, IsObject, IsOptional, IsString, IsUrl, Matches, MinLength, ValidateNested } from "class-validator";
-import { PostType } from "../enum/post.enum";
-import { PostStatus } from "../enum/status.enum";
-import { CreatePostMetaOptionsDto } from "./create-post-meta-options.dto";
+import { postType } from "../enum/post.enum";
+import { postStatus } from "../enum/status.enum";
+import { CreatePostMetaOptionsDto } from "../../meta-options/dto/create-post-meta-options.dto";
 import { Type } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
@@ -18,12 +18,12 @@ export class CreatePostDto {
     @ApiProperty({
         description: 'Type of the post',
         example: 'post',
-        enum: PostType,
+        enum: postType,
     })
-    @IsEnum(PostType)
+    @IsEnum(postType)
     @IsNotEmpty()
-    type: PostType;
-
+    type: postType;
+    
     @ApiProperty({
         description: 'Slug for the post',
         example: 'introduction-to-nestjs',
@@ -38,12 +38,11 @@ export class CreatePostDto {
     @ApiProperty({
         description: 'Status of the post',
         example: 'Published',
-        enum: PostStatus,
+        enum: postStatus,
     })
-    @IsEnum(PostStatus)
+    @IsEnum(postStatus)
     @IsNotEmpty()
-    status: PostStatus;
-
+    status: postStatus;
     @ApiPropertyOptional({
         description: 'Content of the post',
         example: 'This is an introductory post about NestJS...',

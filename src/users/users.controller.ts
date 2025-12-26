@@ -26,7 +26,7 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
-  @Get('{/:id}')
+  @Get()
   @ApiOperation({ summary: 'Get all users with pagination' })
   @ApiResponse({ status: 200, description: 'List of users' })
   @ApiQuery({ name: 'limit', required: false, type: 'number', description: 'Limit number of users returned', example: 10 })
@@ -39,10 +39,15 @@ export class UsersController {
     return this.usersService.findAll(getUserParamDto, limit, page);
   }
 
+  @Get(':id')
+  public getUserById(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findOneById(+id);
+  }
+
   @Post()
-  public createUsers(@Body() createUserDto: CreateUserDto) {
+  public async createUsers(@Body() createUserDto: CreateUserDto) {
     console.log(createUserDto instanceof CreateUserDto);
-    return 'You sent a post request to users endpoint';
+    return await this.usersService.createUser(createUserDto);
   }
 
   @Patch()
