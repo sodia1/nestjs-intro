@@ -1,19 +1,26 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class MetaOption {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({  
-        type: 'json',
-        nullable: false,
-     })
-    metaValue: string;
+  @Column({
+    type: 'json',
+    nullable: false,
+  })
+  metaValue: string;
 
-    @CreateDateColumn()
-    createDate: Date;
+  @CreateDateColumn()
+  createDate: Date;
 
-    @UpdateDateColumn()
-    updateDate: Date;
+  @UpdateDateColumn()
+  updateDate: Date;
 }
