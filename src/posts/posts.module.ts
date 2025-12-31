@@ -12,6 +12,6 @@ import { UsersModule } from 'src/users/users.module';
 @Module({
   controllers: [PostsController],
   providers: [PostsService],
-  imports: [UsersModule, TypeOrmModule.forFeature([Post, User]), TagsModule],
+  imports: [UsersModule, TypeOrmModule.forFeature([Post, MetaOption]), TagsModule],
 })
 export class PostsModule {}
