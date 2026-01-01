@@ -9,9 +9,9 @@ import { UsersService } from 'src/users/providers/users.service';
 import { SignInDto } from '../dtos/signin.dto';
 import { HashingProvider } from './hashing.provider';
 import { JwtService } from '@nestjs/jwt';
-import * as config from '@nestjs/config';
 import jwtConfig from '../config/jwt.config';
-import { email } from '@angular/forms/signals';
+import * as config from '@nestjs/config';
+import { ActiveUserData } from '../interfaces/active-user-data.interface';
 
 @Injectable()
 export class SignInProvider {
@@ -25,10 +25,16 @@ export class SignInProvider {
      */
     private readonly hashingProvider: HashingProvider,
 
+    /**
+     * Inject jwtService
+     */
     private readonly jwtService: JwtService,
 
+    /**
+     * Inject jwtConfiguration
+     */
     @Inject(jwtConfig.KEY)
-    private readonly jwtConfiguration : config.ConfigType<typeof jwtConfig>
+    private readonly jwtConfiguration: config.ConfigType<typeof jwtConfig>,
   ) {}
 
   public async signIn(signInDto: SignInDto) {
@@ -36,7 +42,7 @@ export class SignInProvider {
     let user = await this.usersService.findOneByEmail(signInDto.email);
     // Throw exception if user is not found
     // Above | Taken care by the findInByEmail method
-    console.log("User:: ", user.email, user.password);
+
     let isEqual: boolean = false;
 
     try {
@@ -55,16 +61,23 @@ export class SignInProvider {
       throw new UnauthorizedException('Password does not match');
     }
 
-    // Send confirmation
-    const accessToken = await this.jwtService.signAsync({
-      sub:user.id,
-      email: user.email,
-    },{
-      audience: this.jwtConfiguration.audience,
-      issuer: this.jwtConfiguration.issuer,
-      secret: this.jwtConfiguration.secret,
-      expiresIn: this.jwtConfiguration.accessTokenTtl
-    })
-    return { accessToken };
+    // Generate access token
+    const accessToken = await this.jwtService.signAsync(
+      {
+        sub: user.id,
+        email: user.email,
+      } as ActiveUserData,
+      {
+        audience: this.jwtConfiguration.audience,
+        issuer: this.jwtConfiguration.issuer,
+        secret: this.jwtConfiguration.secret,
+        expiresIn: this.jwtConfiguration.accessTokenTtl,
+      },
+    );
+
+    // Return Access token
+    return {
+      accessToken,
+    };
   }
 }
