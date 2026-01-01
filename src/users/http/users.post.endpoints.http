@@ -2,15 +2,16 @@ POST http://localhost:3000/users
 Content-Type: application/json
 
 {
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "John@doe.com",
+  "firstName": "gaurav",
+  "lastName": "sharma",
+  "email": "gaurav@sharma.com",
   "password": "Password123#"
 }
 
 
 POST http://localhost:3000/users/create-many
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImVtYWlsIjoiZ2F1cmF2QHNoYXJtYS5jb20iLCJpYXQiOjE3NjcyNDQ0NzIsImV4cCI6MTc2NzI0ODA3MiwiYXVkIjoibG9jYWxob3N0OjMwMDAiLCJpc3MiOiJsb2NhbGhvc3Q6MzAwMCJ9.ld5bu7gPQ022t1nf2haSucysp2qMJpMbqCPdn86UtRQ
 
 {
 "users": [
