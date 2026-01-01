@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
-  IsDateString,
+  IsDate,
   IsEnum,
   IsISO8601,
   IsInt,
@@ -11,13 +11,17 @@ import {
   IsString,
   IsUrl,
   Matches,
+  Max,
   MaxLength,
   Min,
   MinLength,
   ValidateNested,
+  isNotEmpty,
 } from 'class-validator';
 
 import { CreatePostMetaOptionsDto } from '../../meta-options/dto/create-post-meta-options.dto';
+import { CreateTagDto } from 'src/tags/dto/create-tag.dto';
+import { DeepPartial } from 'typeorm';
 import { Type } from 'class-transformer';
 import { postStatus } from '../enums/postStatus.enum';
 import { postType } from '../enums/postType.enum';
@@ -47,12 +51,11 @@ export class CreatePostDto {
   })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(256)
-  @MinLength(4)
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
     message:
       'A slug should be all small letters and uses only "-" and without spaces. For example "my-url"',
   })
+  @MaxLength(256)
   slug: string;
 
   @ApiProperty({
@@ -86,21 +89,20 @@ export class CreatePostDto {
     example: 'http://localhost.com/images/image1.jpg',
   })
   @IsOptional()
-  @MinLength(4)
-  @MaxLength(1024)
   @IsUrl()
+  @MaxLength(1024)
   featuredImageUrl?: string;
 
   @ApiPropertyOptional({
     description: 'The date on which the blog post is published',
     example: '2024-03-16T07:46:32+0000',
   })
-  @IsDateString()
+  @IsDate()
   @IsOptional()
   publishOn?: Date;
 
   @ApiPropertyOptional({
-    description: 'Array of ids of tags passed as integers in an array',
+    description: 'Array of ids of tags',
     example: [1, 2],
   })
   @IsOptional()
@@ -117,7 +119,7 @@ export class CreatePostDto {
         metavalue: {
           type: 'json',
           description: 'The metaValue is a JSON string',
-          example: '{"sidebarEnabled": true,}',
+          example: '{"sidebarEnabled": true}',
         },
       },
     },
@@ -126,13 +128,4 @@ export class CreatePostDto {
   @ValidateNested({ each: true })
   @Type(() => CreatePostMetaOptionsDto)
   metaOptions?: CreatePostMetaOptionsDto | null;
-
-  @ApiProperty({
-    type: 'integer',
-    required: true,
-    example: 1,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  authorId: number;
 }

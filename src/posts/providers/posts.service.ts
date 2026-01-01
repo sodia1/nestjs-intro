@@ -15,14 +15,12 @@ import { PatchPostDto } from '../dto/patch-post.dto';
 import { GetPostsDto } from '../dto/get-post.dto';
 import { PaginationProvider } from 'src/common/pagination/providers/pagination.provider';
 import { Paginated } from 'src/common/pagination/interfaces/paginated.interface';
+import { ActiveUserData } from 'src/auth/interfaces/active-user-data.interface';
+import { CreatePostProvider } from './create-post.provider';
 
 @Injectable()
 export class PostsService {
   constructor(
-    /*
-     * Injecting Users Service
-     */
-    private readonly usersService: UsersService,
     /**
      * Inject postsRepository
      */
@@ -41,36 +39,17 @@ export class PostsService {
      * Inject the paginationProvider
      */
     private readonly paginationProvider: PaginationProvider,
+    /**
+     * Inject createPostProvider
+     */
+    private readonly createPostProvider: CreatePostProvider,
   ) {}
 
   /**
    * Creating new posts
    */
-  public async create(@Body() createPostDto: CreatePostDto) {
-    // Find author from database based on authorId
-    let author = await this.usersService.findOneById(createPostDto.authorId);
-    // Find tags
- let tags = await this.tagsService.findMultipleTags(createPostDto.tags || []);
-
-
-    let post = new Post();
-    post.title = createPostDto.title;
-    post.content = createPostDto.content;
-    post.status = createPostDto.status;
-    post.postType = createPostDto.postType ;
-    post.slug = createPostDto.slug ;
-    post.featuredImageUrl =createPostDto.featuredImageUrl ;
-    post.publishOn = createPostDto.publishOn;
-    post.author = author;
-    post.tags = tags
-
-    // Assign the new tags
-    post.tags = tags;
-    // Create post
-     this.postsRepository.create(post);
-
-    // return the post
-    return await this.postsRepository.save(post);
+  public async create(createPostDto: CreatePostDto, user: ActiveUserData) {
+    return await this.createPostProvider.create(createPostDto, user);
   }
 
   public async findAll(
@@ -89,34 +68,32 @@ export class PostsService {
   }
 
   public async update(patchPostDto: PatchPostDto) {
-     let tags ;
-    let post ;
+    let tags: any = undefined;
+    let post: Post | null = null;
 
-    // // Find the Tags
-    if (patchPostDto.tags) {
-      try {
-        tags = await this.tagsService.findMultipleTags(patchPostDto.tags);
-      } catch (error) {
-        throw new RequestTimeoutException(
-          'Unable to process your request at the moment please try later',
-          {
-            description: 'Error connecting to the database',
-          },
-        );
-      }
-
-      // /**
-      //  * If tags were not found
-      //  * Need to be equal number of tags
-      //  */
-      if (!tags || tags.length !== patchPostDto.tags.length) {
-        throw new BadRequestException(
-          'Please check your tag Ids and ensure they are correct',
-        );
-      }
+    // Find the Tags
+    try {
+      tags = await this.tagsService.findMultipleTags(patchPostDto.tags ?? []);
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment please try later',
+        {
+          description: 'Error connecting to the database',
+        },
+      );
     }
 
-    // // Find the Post
+    /**
+     * If tags were not found
+     * Need to be equal number of tags
+     */
+    if (!tags || tags.length !== (patchPostDto.tags ?? []).length) {
+      throw new BadRequestException(
+        'Please check your tag Ids and ensure they are correct',
+      );
+    }
+
+    // Find the Post
     try {
       // Returns null if the post does not exist
       post = await this.postsRepository.findOneBy({
@@ -135,7 +112,7 @@ export class PostsService {
       throw new BadRequestException('The post Id does not exist');
     }
 
-    // // Update the properties
+    // Update the properties
     post.title = patchPostDto.title ?? post.title;
     post.content = patchPostDto.content ?? post.content;
     post.status = patchPostDto.status ?? post.status;
@@ -148,7 +125,7 @@ export class PostsService {
     // Assign the new tags
     post.tags = tags;
 
-    // // Save the post and return
+    // Save the post and return
     try {
       await this.postsRepository.save(post);
     } catch (error) {
