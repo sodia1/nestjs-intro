@@ -4,16 +4,18 @@ import { Module, forwardRef } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './providers/auth.service';
 import { BcryptProvider } from './providers/bcrypt.provider';
+import { GenerateTokensProvider } from './providers/generate-tokens.provider';
 import { HashingProvider } from './providers/hashing.provider';
 import { JwtModule } from '@nestjs/jwt';
+import { RefreshTokenProvider } from './providers/refresh-tokens.provider';
 import { SignInProvider } from './providers/sign-in.provider';
 import { UsersModule } from 'src/users/users.module';
+import { GoogleAuthenticationController } from './social/google-authentication.controller';
+import { GoogleAuthenticationService } from './social/providers/google-authentication.service';
 import jwtConfig from './config/jwt.config';
-import { GenerateTokensProvider } from './providers/generate-tokens.provider';
-import { RefreshTokenProvider } from './providers/refresh-tokens.provider';
 
 @Module({
-  controllers: [AuthController],
+  controllers: [AuthController, GoogleAuthenticationController],
   providers: [
     AuthService,
     {
@@ -22,7 +24,8 @@ import { RefreshTokenProvider } from './providers/refresh-tokens.provider';
     },
     SignInProvider,
     GenerateTokensProvider,
-    RefreshTokenProvider
+    RefreshTokenProvider,
+    GoogleAuthenticationService,
   ],
   imports: [
     forwardRef(() => UsersModule),

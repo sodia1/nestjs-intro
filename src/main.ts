@@ -3,6 +3,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { DataResponseInterceptor } from './common/interceptors/data-response/data-response.interceptor';
+import { ConfigService } from '@nestjs/config';
+import { AwsCredentialIdentity } from '@aws-sdk/types'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -39,6 +42,18 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  const configService = app.get(ConfigService);
+
+  const awsConfig = {
+    region: configService.get<string>('appConfig.awsRegion'),
+    credentials: {
+      accessKeyId: configService.get<string>('appConfig.awsAccessKeyId'),
+      secretAccessKey: configService.get<string>('appConfig.awsSecretAccessKey'),
+    } as AwsCredentialIdentity,
+  };
+
+  app.enableCors();
+  app.useGlobalInterceptors(new DataResponseInterceptor());
   await app.listen(3000);
 }
 bootstrap();

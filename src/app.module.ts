@@ -10,6 +10,7 @@ import { PostsModule } from './posts/posts.module';
 import { Tag } from './tags/tag.entity';
 import { TagsModule } from './tags/tags.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UploadsModule } from './uploads/uploads.module';
 /**
  * Importing Entities
  * */
@@ -59,6 +60,7 @@ const ENV = process.env.NODE_ENV;
     TagsModule,
     MetaOptionsModule,
     PaginationModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService,    

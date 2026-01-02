@@ -35,6 +35,10 @@ export class SignInProvider {
     // Throw exception if user is not found
     // Above | Taken care by the findInByEmail method
 
+    if (!user || !user.password) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     let isEqual: boolean = false;
 
     try {
