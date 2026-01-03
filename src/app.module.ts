@@ -24,6 +24,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenGuard } from './auth/guards/access-token/access-token.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthenticationGuard } from './auth/guards/authentication/authentication.guard';
+import { MailModule } from './mail/mail.module';
 
 // Get the current NODE_ENV
 const ENV = process.env.NODE_ENV;
@@ -61,6 +62,7 @@ const ENV = process.env.NODE_ENV;
     MetaOptionsModule,
     PaginationModule,
     UploadsModule,
+    MailModule
   ],
   controllers: [AppController],
   providers: [AppService,    
